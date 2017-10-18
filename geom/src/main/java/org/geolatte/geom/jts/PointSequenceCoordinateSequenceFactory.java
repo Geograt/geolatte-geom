@@ -27,7 +27,6 @@ import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CoordinateSystem;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -81,6 +80,16 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
             if (hasVerticalAxis(crs)) {
                 psc[2] = cs.getOrdinate(i, 2);
             }
+
+            // Martin Steinwender Beginn Modification
+            // transfer measure values to position
+            if (hasMeasureAxis(crs)) {
+                final int idxM = hasVerticalAxis(crs) ? 3 : 2;
+                final double mOrdinate = cs.getOrdinate(i, CoordinateSequence.M);
+                psc[idxM] = mOrdinate;
+            }
+            // Martin Steinwender End Modification
+
             builder.add(psc);
         }
         return builder.toPositionSequence();
