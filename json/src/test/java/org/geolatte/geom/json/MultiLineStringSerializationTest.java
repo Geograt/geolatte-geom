@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
-import static org.geolatte.geom.json.Feature.SUPPRESS_CRS_SERIALIZATION;
+import static org.geolatte.geom.json.Setting.SUPPRESS_CRS_SERIALIZATION;
 import static org.geolatte.geom.json.GeoJsonStrings.*;
 import static org.junit.Assert.assertEquals;
 
@@ -20,7 +20,7 @@ public class MultiLineStringSerializationTest extends GeoJsonTest {
     @Test
     public void testSerializeEmpty() throws JsonProcessingException {
 
-        ObjectMapper mapper = createMapperWithFeature(SUPPRESS_CRS_SERIALIZATION, true);
+        ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         MultiLineString<?> mls = new MultiLineString(WGS84);
         String rec = mapper.writeValueAsString(mls);
         assertEquals(emptyMultiLineString,rec) ;
@@ -28,7 +28,7 @@ public class MultiLineStringSerializationTest extends GeoJsonTest {
 
     @Test
     public void testSerializeSimple() throws JsonProcessingException {
-        ObjectMapper mapper = createMapperWithFeature(SUPPRESS_CRS_SERIALIZATION, true);
+        ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         MultiLineString<?> mls = multilinestring(
                 linestring(WGS84, g(1, 1), g(1, 2)),
                 linestring(WGS84, g(3, 4), g(5, 6))

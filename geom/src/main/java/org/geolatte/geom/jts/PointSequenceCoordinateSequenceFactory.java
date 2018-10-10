@@ -21,13 +21,12 @@
 
 package org.geolatte.geom.jts;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.CoordinateSequenceFactory;
+import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CoordinateSystem;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -59,8 +58,8 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         // This is causing problems when working with Geotools JTS class in
         // transformation.
         // This is just a quick fix in order to get this working...
-        if (dimension > 3)
-            throw new IllegalArgumentException("dimension must be <= 3");
+//        if (dimension > 3)
+//            throw new IllegalArgumentException("dimension must be <= 3");
         return new CoordinateArraySequence(size, dimension);
     }
 
@@ -76,11 +75,19 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         Arrays.fill(psc, Double.NaN);
         PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(cs.size(), posType);
         for (int i = 0; i < cs.size(); i++) {
-            psc[0] = cs.getOrdinate(i, 0);
-            psc[1] = cs.getOrdinate(i, 1);
+            psc[0] = cs.getX(i);
+            psc[1] = cs.getY(i);
             if (hasVerticalAxis(crs)) {
-                psc[2] = cs.getOrdinate(i, 2);
+                psc[2] = cs.getZ(i);
             }
+
+            // transfer measure values to position
+            if (hasMeasureAxis(crs)) {
+                final int idxM = hasVerticalAxis(crs) ? 3 : 2;
+                final double mOrdinate = cs.getM(i);
+                psc[idxM] = mOrdinate;
+            }
+
             builder.add(psc);
         }
         return builder.toPositionSequence();
@@ -88,12 +95,13 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
 
     private CoordinateReferenceSystem<?> determineCRS(Coordinate[] coordinates) {
         boolean hasZ, hasM = false;
-        if (coordinates == null || coordinates.length == 0)
+        if (coordinates == null || coordinates.length == 0) {
             return PROJECTED_2D_METER;
-        if (coordinates[0] instanceof DimensionalCoordinate) {
-            hasM = !Double.isNaN(((DimensionalCoordinate) coordinates[0]).getM());
         }
-        hasZ = !Double.isNaN(coordinates[0].z);
+
+        hasM = !Double.isNaN( coordinates[0].getM());
+        hasZ = !Double.isNaN(coordinates[0].getZ());
+
         if (hasM && hasZ) {
             return PROJECTED_3DM_METER;
         } else if (hasM) {
@@ -119,15 +127,15 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
     }
 
     private <P extends Position> void copy(Coordinate co, double[] ordinates, CoordinateReferenceSystem<P> crs) {
-        ordinates[0] = co.x;
-        ordinates[1] = co.y;
+        ordinates[0] = co.getX();
+        ordinates[1] = co.getY();
         boolean hasVerticalAxis = hasVerticalAxis(crs);
         if (hasVerticalAxis) {
-            ordinates[2] = co.z;
+            ordinates[2] = co.getZ();
         }
         if (hasMeasureAxis(crs)) {
             int idxM = hasVerticalAxis ? 3 : 2;
-            ordinates[idxM] = (co instanceof DimensionalCoordinate) ? ((DimensionalCoordinate) co).m : Double.NaN;
+            ordinates[idxM] = co.getM();
         }
     }
 

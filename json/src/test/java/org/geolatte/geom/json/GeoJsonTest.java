@@ -1,6 +1,8 @@
 package org.geolatte.geom.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.junit.Before;
 
 import java.util.Map;
@@ -18,21 +20,28 @@ abstract public class GeoJsonTest {
         mapper.registerModule(new GeolatteGeomModule());
     }
 
-    public ObjectMapper createMapperWithFeatures(Map<Feature, Boolean> features) {
+    public ObjectMapper createMapper(Map<Setting, Boolean> features) {
         GeolatteGeomModule module = new GeolatteGeomModule();
-        features.forEach((f, v) -> module.setFeature(f, v));
+        features.forEach((f, v) -> module.set(f, v));
         mapper = new ObjectMapper();
         mapper.registerModule(module);
         return mapper;
     }
 
-    public ObjectMapper createMapperWithFeature(Feature feature, boolean value) {
+    public ObjectMapper createMapper(Setting setting, boolean value) {
         GeolatteGeomModule module = new GeolatteGeomModule();
-        module.setFeature(feature,value);
+        module.set(setting, value);
         mapper = new ObjectMapper();
         mapper.registerModule(module);
         return mapper;
     }
 
+    public <P extends Position> ObjectMapper createMapper(CoordinateReferenceSystem<P> crs, Setting f, boolean isSet) {
+        mapper = new ObjectMapper();
+        GeolatteGeomModule module = new GeolatteGeomModule(crs);
+        module.set(f, isSet);
+        mapper.registerModule(module);
+        return mapper;
+    }
 
 }

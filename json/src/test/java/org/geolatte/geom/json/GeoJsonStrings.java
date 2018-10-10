@@ -9,6 +9,8 @@ public class GeoJsonStrings {
     static String emptyPointText = "{\"type\":\"Point\",\"coordinates\":[]}";
     static String pointText = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}";
     static String pointText3D = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0,3.0]}";
+    static String pointText2DM = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0,4.0]}";
+    static String pointText3DM = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0,3.0, 4.0]}";
     static String pointTextWithCrs = "{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"coordinates\":[1.0,2.0]}";
     static String pointTextWithUrnCrs = "{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"urn:ogc:def:crs:EPSG::31370\"}},\"coordinates\":[1.0,2.0]}";
     static String pointTextWithCrs3D = "{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"coordinates\":[1.0,2.0,3.0]}";
@@ -19,6 +21,7 @@ public class GeoJsonStrings {
     //LineStrings
     static String emptyLineString = "{\"type\":\"LineString\",\"coordinates\":[]}";
     static String simpleLineString = "{\"type\":\"LineString\",\"coordinates\":[[1.0,2.0],[3.0,4.0]]}";
+    static String lineString2DM = "{\"type\":\"LineString\",\"coordinates\":[[1.0,2.0, 3.0],[10.0, 20.0, 30.0]]}";
     static String lineStringWithCrs = "{\"type\":\"LineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"coordinates\":[[1.0,2.0],[3.0,4.0]]}";
 
 
@@ -48,4 +51,13 @@ public class GeoJsonStrings {
     static String geometryCollection = "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"LineString\",\"coordinates\":[[1.0,1.0],[1.0,2.0]]},{\"type\":\"Point\",\"coordinates\":[5.0,6.0]}]}";
     static String geometryCollectionWithCrs= "{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"geometries\":[{\"type\":\"LineString\",\"coordinates\":[[1.0,1.0],[1.0,2.0]]},{\"type\":\"Point\",\"coordinates\":[5.0,6.0]}]}";
     static String geometryCollectionWithCrs3D= "{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"geometries\":[{\"type\":\"LineString\",\"coordinates\":[[1.0,1.0,1.0],[1.0,2.0,3.0]]},{\"type\":\"Point\",\"coordinates\":[5.0,6.0,7.0]}]}";
+
+    // Features
+    static String feature = "{\"geometry\":{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[1.0,2.0]},\"id\":\"1\",\"properties\":{\"a\":1},\"type\":\"Feature\"}";
+
+
+    static String featureIntId = "{\"type\" : \"Feature\", \"id\": 1, \"geometry\":  {\"type\":\"Point\",\"coordinates\":[1.0,2.0]}, " +
+            "\"properties\": { \"a\" : 1 }}";
+
+
 }

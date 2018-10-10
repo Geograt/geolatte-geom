@@ -33,8 +33,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -49,8 +47,9 @@ import java.util.function.Function;
 public class CrsRegistry {
 
     final private static Logger LOGGER = LoggerFactory.getLogger(CrsRegistry.class);
-    final private static ConcurrentHashMap<Integer, CoordinateReferenceSystem<? extends Position>> crsMap = new ConcurrentHashMap<Integer, CoordinateReferenceSystem<? extends Position>>(4000);
-    final private static Map<Integer, CrsId> crsIdMap = new HashMap<Integer, CrsId>(4000);
+    final private static ConcurrentHashMap<CrsId, CoordinateReferenceSystem<? extends Position>> crsMap =
+            new ConcurrentHashMap<>(4000);
+
     final private static String DELIM = "\\|";
 
     static {
@@ -92,12 +91,9 @@ public class CrsRegistry {
         Integer srid = Integer.valueOf(tokens[1]);
         try {
             CoordinateReferenceSystem crs = decoder.decode(tokens[2], srid);
-            crsMap.put(srid, crs);
-            crsIdMap.put(srid, crs.getCrsId());
+            crsMap.put(CrsId.valueOf(srid), crs);
         } catch (WktDecodeException e) {
             LOGGER.warn(String.format("Can't parse srid %d (%s). \n%s", srid, tokens[2], e.getMessage()));
-        } catch (InconsistentCoordinateSystemException e) {
-            LOGGER.warn(String.format("Can't parse srid %d (%s) -- inconsistent coordinate system. \n%s", srid, tokens[2], e.getMessage()));
         } catch (RuntimeException e) {
             LOGGER.warn(String.format("Can't parse srid %d (%s) -- inconsistent coordinate system. \n%s", srid, tokens[2], e.getMessage()));
         }
@@ -114,9 +110,24 @@ public class CrsRegistry {
     public static CoordinateReferenceSystem<?> getCoordinateReferenceSystemForEPSG(int epsgCode,
                                                                                    CoordinateReferenceSystem<?>
                                                                                            fallback) {
-        CoordinateReferenceSystem<?> crs = crsMap.get(epsgCode);
+        return getCoordinateReferenceSystem(CrsId.valueOf(epsgCode), fallback);
+    }
+
+    /**
+     * returns the <code>CoordinateReferenceSystem</code> for the specified {@code CrsId}
+     *
+     * @param crsId the identifier for the Coordinate Reference System
+     * @param fallback the coordinate
+     * @return the <code>CoordinateReferenceSystem</code> corresponding to the specified EPSG code, or null if
+     * no such system is registered.
+     */
+    public static CoordinateReferenceSystem<?> getCoordinateReferenceSystem(CrsId crsId,
+                                                                            CoordinateReferenceSystem<?>
+                                                                                           fallback) {
+        CoordinateReferenceSystem<?> crs = crsMap.get(crsId);
         return crs != null ? crs : fallback;
     }
+
 
     /**
      * Returns the registered coordinate reference system, or when unavailable in the registry, create a new Projected 2D system and register
@@ -126,17 +137,59 @@ public class CrsRegistry {
      * @return a CoordinateReferenceSystem with the specified epsg code
      */
     public static CoordinateReferenceSystem<?> ifAbsentReturnProjected2D(int epsgCode) {
-        return crsMap.computeIfAbsent(epsgCode, key -> CoordinateReferenceSystems.mkProjected(key, LinearUnit.METER));
+        return computeIfAbsent(CrsId.valueOf(epsgCode), key -> CoordinateReferenceSystems.mkProjected(key, LinearUnit.METER));
+    }
+
+    /**
+     * Returns the registered coordinate reference system, or when unavailable in the registry, create a new Geographic 2D system and register
+     * this on-the-fly.
+     *
+     * @param epsgCode the code to look up
+     * @return a CoordinateReferenceSystem with the specified epsg code
+     */
+    public static CoordinateReferenceSystem<?> ifAbsentReturnGeographic2D(int epsgCode) {
+        return computeIfAbsent(CrsId.valueOf(epsgCode),  key -> CoordinateReferenceSystems.mkGeographic(key, AngularUnit.RADIAN));
+    }
+
+    /**
+     * Returns the registered coordinate reference system, or when unavailable in the registry, create a new Geographic 2D system and register
+     * this on-the-fly.
+     *
+     * @param epsgCode the code to look up
+     * @return a CoordinateReferenceSystem with the specified epsg code
+     */
+
+    /**
+     * Returns the registered coordinate reference system, or when unavailable in the registry, create a new reference system and register
+     * it on-the-fly.
+     *
+     * @param crsId the {@code CrsId} for the Coordinate reference system
+     * @param buildCrs the function that builds a new Coordinate Reference System, if none is available in this Registry
+     * @return the current (existing or computed) coordinate reference system identified by the specified {@code CrsId} identifier
+     */
+    public static CoordinateReferenceSystem<?> computeIfAbsent(CrsId crsId, Function<? super CrsId, ? extends CoordinateReferenceSystem<? extends Position>> buildCrs) {
+        return crsMap.computeIfAbsent(crsId, buildCrs);
+    }
+
+    /**
+     * Registers a {@code CoordinateReferenceSystem} in the registry.
+     *
+     * @param crs      the {@code CoordinateReferenceSystem} to register
+     */
+    public static void registerCoordinateReferenceSystem(CoordinateReferenceSystem<?> crs) {
+        crsMap.put(crs.getCrsId(), crs);
     }
 
     /**
      * Registers a {@code CoordinateReferenceSystem} in the registry under the specified (pseudo-)EPSG code.
      *
+     * @param id       the {@code CrsId} under which to register this CoordinateReferenceSystem
      * @param crs      the {@code CoordinateReferenceSystem} to register
      */
-    public static void registerCoordinateReferenceSystem(CoordinateReferenceSystem<?> crs) {
-        crsMap.put(crs.getCrsId().getCode(), crs);
+    public static void registerCoordinateReferenceSystem(CrsId id, CoordinateReferenceSystem<?> crs) {
+        crsMap.put(id, crs);
     }
+
 
     /**
      * Determine if the registry contains the {@code CoordinateReferenceSystem} identified by its SRID
@@ -145,11 +198,11 @@ public class CrsRegistry {
      * @return true iff the registry has a corresponding {@code CoordinateReferenceSystem}
      */
     public static boolean hasCoordinateReferenceSystemForEPSG(int epsgCode) {
-        return crsMap.containsKey(epsgCode);
+        return crsMap.containsKey(CrsId.valueOf(epsgCode));
     }
 
     public static Geographic2DCoordinateReferenceSystem getGeographicCoordinateReferenceSystemForEPSG(int epsgCode) {
-        CoordinateReferenceSystem<? extends Position> crs = crsMap.get(epsgCode);
+        CoordinateReferenceSystem<? extends Position> crs = crsMap.get(CrsId.valueOf(epsgCode));
         if (crs == null) return null;
         if (crs.getPositionClass().equals(G2D.class)) {
             return (Geographic2DCoordinateReferenceSystem) crs;
@@ -158,7 +211,7 @@ public class CrsRegistry {
     }
 
     public static ProjectedCoordinateReferenceSystem getProjectedCoordinateReferenceSystemForEPSG(int epsgCode) {
-        CoordinateReferenceSystem<? extends Position> crs = crsMap.get(epsgCode);
+        CoordinateReferenceSystem<? extends Position> crs = crsMap.get(CrsId.valueOf(epsgCode));
         if (crs.getPositionClass().equals(C2D.class)) {
             return (ProjectedCoordinateReferenceSystem) crs;
         }
@@ -174,7 +227,8 @@ public class CrsRegistry {
      * no such system is registered.
      */
     public static CrsId getCrsIdForEPSG(int epsgCode) {
-        return crsIdMap.get(epsgCode);
+        CrsId crsId = CrsId.valueOf(epsgCode);
+        return crsMap.containsKey(crsId) ? crsId : null;
     }
 
 }

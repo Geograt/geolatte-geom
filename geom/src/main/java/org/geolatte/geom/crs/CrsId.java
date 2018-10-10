@@ -68,14 +68,12 @@ public class CrsId {
      * @return a <code>CrsId</code> for the specified authority and code.
      */
     public static CrsId valueOf(String authority, int code) {
-        if (DEFAULT_AUTHORITY.equalsIgnoreCase(authority) && (code <= 0 )) {
-            return CrsId.UNDEFINED;
-        }
-        CrsId result = null;
-        if (DEFAULT_AUTHORITY.equalsIgnoreCase(authority)) {
-            result = CrsRegistry.getCrsIdForEPSG(code);
-        }
-        return result == null ? new CrsId(authority, code) : result;
+        if (isUnknownEPSG(authority, code)) return CrsId.UNDEFINED;
+        return new CrsId(authority, code);
+    }
+
+    private static boolean isUnknownEPSG(String authority, int code) {
+        return DEFAULT_AUTHORITY.equalsIgnoreCase(authority) && (code <= 0);
     }
 
     /**
@@ -131,6 +129,18 @@ public class CrsId {
 
     public String toUrn() {
         return String.format("urn:ogc:def:crs:%s::%s", authority, code);
+    }
+
+    /**
+     * Creates an instance that identifies the crs identified by this {@code CrsId}, but
+     * extended with (optionally) a vertical or measure axis.
+     *
+     * @param zUnit the unit for the vertical axis (or null if there is no such axis)
+     * @param mUnit the unit for the measure axis (or null if there is no such axis)
+     * @return
+     */
+    public CrsId extend(LinearUnit zUnit, Unit mUnit) {
+        return zUnit == null && mUnit == null ? this : new CrsExtendedId(this, zUnit, mUnit);
     }
 
     @Override

@@ -88,7 +88,7 @@ public class PointDeserializationTest extends GeoJsonTest{
     public void testDeserializePointTextWithLimitToCrs() throws IOException {
         mapper = new ObjectMapper();
         GeolatteGeomModule module = new GeolatteGeomModule(wgs3D);
-        module.setFeature(Feature.FORCE_DEFAULT_CRS_DIMENSION, true);
+        module.set(Setting.FORCE_DEFAULT_CRS_DIMENSION, true);
         mapper.registerModule(module);
         Point<?> pnt = mapper.readValue(pointText, Point.class);
         Point<G3D> expected = point(wgs3D, g(1, 2, 0));
@@ -99,7 +99,7 @@ public class PointDeserializationTest extends GeoJsonTest{
     public void testDeserializePointTextWithLimitToCrsReduce() throws IOException {
         mapper = new ObjectMapper();
         GeolatteGeomModule module = new GeolatteGeomModule(WGS84);
-        module.setFeature(Feature.FORCE_DEFAULT_CRS_DIMENSION, true);
+        module.set(Setting.FORCE_DEFAULT_CRS_DIMENSION, true);
         mapper.registerModule(module);
         Point<?> pnt = mapper.readValue(pointText3D, Point.class);
         Point<G2D> expected = point(WGS84, g(1, 2));
@@ -120,6 +120,14 @@ public class PointDeserializationTest extends GeoJsonTest{
         };
         Point<C2D> pnt = mapper.readValue(pointTextWithUrnCrs, typeRef);
         Point<C2D> expected = point(lambert72, c(1, 2));
+        assertEquals(expected, pnt);
+    }
+
+    @Test
+    public void testForce3DMTo2DMPoint() throws IOException {
+        ObjectMapper mapper = createMapper(wgs2DM, Setting.FORCE_DEFAULT_CRS_DIMENSION, true);
+        Point<?> pnt = mapper.readValue(pointTextWithCrs3D, Point.class);
+        Point<?> expected = point(wgs2DM, gM(1, 2, 3.0));
         assertEquals(expected, pnt);
     }
 

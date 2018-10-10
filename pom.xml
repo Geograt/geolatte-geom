@@ -1,14 +1,14 @@
-<!-- ~ This file is part of the GeoLatte project. ~ ~ GeoLatte is free software: 
-	you can redistribute it and/or modify ~ it under the terms of the GNU Lesser 
-	General Public License as published by ~ the Free Software Foundation, either 
-	version 3 of the License, or ~ (at your option) any later version. ~ ~ GeoLatte 
-	is distributed in the hope that it will be useful, ~ but WITHOUT ANY WARRANTY; 
-	without even the implied warranty of ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-	PURPOSE. See the ~ GNU Lesser General Public License for more details. ~ 
-	~ You should have received a copy of the GNU Lesser General Public License 
-	~ along with GeoLatte. If not, see <http://www.gnu.org/licenses />. ~ ~ Copyright 
-	(C) 2010 - 2011 and Ownership of code is shared by: ~ Qmino bvba - Romeinsestraat 
-	18 - 3001 Heverlee (http://www.qmino.com) ~ Geovise bvba - Generaal Eisenhowerlei 
+<!-- ~ This file is part of the GeoLatte project. ~ ~ GeoLatte is free software:
+	you can redistribute it and/or modify ~ it under the terms of the GNU Lesser
+	General Public License as published by ~ the Free Software Foundation, either
+	version 3 of the License, or ~ (at your option) any later version. ~ ~ GeoLatte
+	is distributed in the hope that it will be useful, ~ but WITHOUT ANY WARRANTY;
+	without even the implied warranty of ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR
+	PURPOSE. See the ~ GNU Lesser General Public License for more details. ~
+	~ You should have received a copy of the GNU Lesser General Public License
+	~ along with GeoLatte. If not, see <http://www.gnu.org/licenses />. ~ ~ Copyright
+	(C) 2010 - 2011 and Ownership of code is shared by: ~ Qmino bvba - Romeinsestraat
+	18 - 3001 Heverlee (http://www.qmino.com) ~ Geovise bvba - Generaal Eisenhowerlei
 	9 - 2140 Antwerpen (http://www.geovise.com) -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -18,7 +18,7 @@
     <artifactId>geolatte</artifactId>
     <name>geolatte</name>
     <packaging>pom</packaging>
-    <version>1.2.0</version>
+    <version>1.5.0-SNAPSHOT</version>
 
 	<description>
 		This geoLatte-geom project contains modules for working with geometries.
@@ -103,7 +103,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>2.2.1</version>
+						<version>3.0.1</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -120,8 +120,8 @@
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<version>2.9.1</version>
 						<!-- doclint config removed for building with jdk < 8 (as in Travis) -->
-						<!--<configuration> -->
-						<!--<additionalparam>-Xdoclint:none</additionalparam> -->
+						<!--<configuration>-->
+						<!--<additionalparam>-Xdoclint:none</additionalparam>-->
 						<!--</configuration> -->
 						<executions>
 							<execution>
@@ -137,7 +137,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.5</version>
+						<version>1.6</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
@@ -153,7 +153,7 @@
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.3</version>
+						<version>1.6.8</version>
 						<extensions>true</extensions>
 						<configuration>
 							<serverId>ossrh</serverId>
@@ -174,7 +174,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
+				<version>3.8.0</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -186,7 +186,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
+				<version>3.0.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -218,7 +218,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.3</version>
+                <version>1.6.8</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
